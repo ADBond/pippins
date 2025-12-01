@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Play Pippins Aplenty Online - in development</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" src="/src/main.ts" defer></script>
+    <meta name="description" content="Play Pippins Aplenty Online is a place to play
+        the trick-taking card game Pippins Aplenty against bot players
+        in-browser.">
+</head>
+
+<body>
+
+    <div class="trumps" id="trump-holder"></div>
+
+    <div class="scores" id="scores"></div>
+
+    <div class="game-board">
+
+        <div class="player-area comp1">
+            <div class="played" id="played-comp1"></div>
+        </div>
+
+        <div class="player-area comp2">
+            <div class="played" id="played-comp2"></div>
+        </div>
+
+        <div class="player-area comp3">
+            <div class="played" id="played-comp3"></div>
+        </div>
+
+        <div class="player-area player">
+            <div class="played" id="played-player"></div>
+        </div>
+    </div>
+
+    <div class="previous-trick">
+        <div class="prev-area">
+            <div id="prev-comp1" class="prev-slot"></div>
+            <div id="prev-comp2" class="prev-slot"></div>
+            <div id="prev-comp3" class="prev-slot"></div>
+            <div id="prev-player" class="prev-slot"></div>
+        </div>
+    </div>
+
+    <div class="hand">
+        <div id="player-hand"></div>
+    </div>
+
+</body>
+
+</html>

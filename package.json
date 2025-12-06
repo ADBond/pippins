@@ -1,0 +1,19 @@
+{
+  "name": "pippins",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified, sorry :/2\" && exit 1",
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build"
+  },
+  "keywords": [],
+  "author": "Andy Bond",
+  "license": "MIT",
+  "devDependencies": {
+    "tsx": "^4.20.6",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}

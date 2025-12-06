@@ -5,7 +5,7 @@ COPY package.json package-lock.json ./
 
 RUN npm ci --ignore-scripts
 
-COPY static/ ./static/
+COPY public/ ./public/
 COPY src/ ./src/
 COPY index.html ./index.html
 

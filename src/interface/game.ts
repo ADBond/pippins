@@ -1,12 +1,11 @@
 import { Game } from "../game/game";
-import { GameConfig } from "../game/gamestate";
 
 let game: Game;
 
 export function newGame(): void {
     game = new Game(
-        // ['human', 'arundel', 'arundel'],
-        // config,
+        ['human', 'random', 'random', 'random'],
+        {},
     );
 }
 

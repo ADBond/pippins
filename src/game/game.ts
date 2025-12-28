@@ -1,4 +1,5 @@
 import { GameConfig, GameState } from "./gamestate";
+import { AgentName } from "./agent/agent";
 
 const defaultConfig: GameConfig = {}
 
@@ -7,17 +8,26 @@ export class Game {
   // public logs: GameLog[] = [];
   // private currentLog: GameLog;
   // private gameID: string;
-  // private playerNames: AgentName[];
 
   constructor(
-      // playerNames: AgentName[],
+      playerNames: AgentName[],
       config: GameConfig = defaultConfig,
     ) {
     // this.gameID = randomID();
-    // this.state = new GameState(playerNames, config);
-    this.state = new GameState();
+    this.state = new GameState(playerNames, config);
     // this.currentLog = new GameLog(this.gameID, config, playerNames, this.simulation);
     // this.playerNames = playerNames;
-    // this.incrementState();
+    this.incrementState();
+  }
+
+  async incrementState() {
+    // await this.state.increment(this.currentLog);
+    // if (this.currentLog.complete) {
+    //   this.logs.push(this.currentLog);
+    //   if (!this.simulation) {
+    //     sendGameLog(this.currentLog);
+    //   }
+    //   this.currentLog = new GameLog(this.gameID, this.state.config, this.playerNames, this.simulation);
+    // }
   }
 }

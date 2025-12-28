@@ -119,3 +119,19 @@ export const SUITS: Suit[] = [
 
 export const arbitrarySuit = SUITS[0];
 export const N_SUITS = SUITS.length;
+
+export function getFullPack(): Card[] {
+    const cards = [];
+    let index = 0;
+    for (const rank of RANKS) {
+      if (rank.name === "A") {
+          rank.ttRankAbove = 2;
+      }
+      for (const suit of SUITS) {
+        let card = new Card(suit, rank, index)
+        cards.push(card);
+        index++;
+      }
+    }
+    return cards;
+  }

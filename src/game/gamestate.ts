@@ -83,6 +83,25 @@ export class GameState {
         return 12;
     }
 
+    get numTrumps(): number {
+        return this.trumpCards.length;
+    }
+
+    get trumps(): Suit[] {
+        return this.trumpCards.map(
+            (card) => card.suit
+        )
+    }
+
+    get topTrumpRankValue(): number {
+        if (this.trumpCards.length === 0) {
+            // this is an arbitrary number below any suit value
+            return -10;
+        }
+        // final array card - highest value
+        return this.trumpCards[this.numTrumps - 1].rank.trickTakingRank;
+    }
+
     get trickInProgressCards(): Card[] {
         return this.trickInProgress.map(
             ([card, _player]) => card

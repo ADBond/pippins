@@ -8,6 +8,7 @@ export class Game {
   // public logs: GameLog[] = [];
   // private currentLog: GameLog;
   // private gameID: string;
+  private playerNames: AgentName[];
 
   constructor(
       playerNames: AgentName[],
@@ -16,7 +17,7 @@ export class Game {
     // this.gameID = randomID();
     this.state = new GameState(playerNames, config);
     // this.currentLog = new GameLog(this.gameID, config, playerNames, this.simulation);
-    // this.playerNames = playerNames;
+    this.playerNames = playerNames;
     this.incrementState();
   }
 

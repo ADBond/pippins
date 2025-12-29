@@ -26,10 +26,15 @@ export async function renderState(state: GameStateForUI) {
     const playedEl = document.getElementById(`played-${p}`)!;
     playedEl.innerHTML = '';
     const card = state.played[p as PlayerName];
-    const el = createCardElement(
-      card !== null ? (card === 'back' ? 'back' : card.toStringShort()) : ""
-    );
-    el.classList.add('played-card');
+    let el: HTMLElement;
+    if (card === 'back') {
+      el = createCardElement('back');
+    } else {
+      el = createCardElement(
+          card !== null ? card.toStringShort() : ""
+      );
+      el.classList.add('played-card');
+    }
     playedEl.appendChild(el);
   });
 

@@ -65,6 +65,11 @@ body {
     transition: transform 0.1s;
 }
 
+.card-back {
+    background-image: url('back.svg');
+    background-size: 72px 96px;
+}
+
 .hand .card {
     cursor: pointer;
 }

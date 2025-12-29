@@ -18,11 +18,10 @@ export class Game {
     this.state = new GameState(playerNames, config);
     // this.currentLog = new GameLog(this.gameID, config, playerNames, this.simulation);
     this.playerNames = playerNames;
-    this.incrementState();
   }
 
   async incrementState() {
-    // await this.state.increment(this.currentLog);
+    await this.state.increment();
     // if (this.currentLog.complete) {
     //   this.logs.push(this.currentLog);
     //   if (!this.simulation) {

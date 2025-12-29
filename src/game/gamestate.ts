@@ -1,4 +1,4 @@
-import { Card, Suit, getFullPack } from "./card";
+import { Card, Suit, getFullPack, shuffle } from "./card";
 import { Player, PlayerName } from "./player";
 import { Agent, AgentName, agentLookup } from "./agent/agent";
 
@@ -51,7 +51,7 @@ export class GameState {
         const state = this.currentState;
         switch (state) {
             case 'game_initialise':
-                // this.dealCards(this.pack, log);
+                this.dealCards();
                 break;
             case 'play_card':
                 const moveIndex = await this.computerMove();
@@ -271,6 +271,34 @@ export class GameState {
         const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
         this.currentPlayerIndex = newCurrentPlayerIndex;
         return true;
+    }
+
+    // TODO: seed?
+    dealCards(): void {
+        const pack = getFullPack();
+        shuffle(pack);
+        for (let i = 0; i < 13; i++) {
+            // for (const player of this.state.players) {
+            // TODO: loop this properly!
+            for (let playerIndex = 0; playerIndex < this.numPlayers; playerIndex++) {
+                const card = pack.pop();
+                if (card) this.giveCardToPlayer(playerIndex, card);
+            }
+        }
+
+        // TODO now pack should be empty
+        console.log("Empty pack:");
+        console.log([...pack]);
+        console.log([...this.getPlayerHand(0)]);
+        console.log([...this.getPlayerHand(1)]);
+        console.log([...this.getPlayerHand(2)]);
+        console.log([...this.getPlayerHand(3)]);
+        this.trumpCards = [];
+        // TODO: could adjust this in config:
+        this.currentState = 'discarding';
+        this.currentPlayerIndex = this.getNextPlayerIndex(this.dealerIndex);
+        this.handNumber++;
+        this.trickIndex = 0;
     }
 
 }

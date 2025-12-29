@@ -152,6 +152,25 @@ export class GameState {
         return null;
     }
 
+    get played(): Record<PlayerName, Card | null | 'back'> {
+        let played;
+        if (this.currentState === 'discarding') {
+            played = Object.fromEntries(
+                playerNameArr.map((name): [PlayerName, Card | null | 'back'] => [
+                    name, this.getPlayedCard(name, this.discards) === null ? null : 'back'
+                ])
+            ) as Record<PlayerName, Card | 'back' | null>;
+        } else {
+            played = Object.fromEntries(
+                playerNameArr.map((name): [PlayerName, Card | null | 'back'] => [
+                    name, this.getPlayedCard(name, this.trickInProgress)
+                ])
+            ) as Record<PlayerName, Card | 'back' | null>;
+        }
+
+        return played;
+    }
+
     get previous(): Record<PlayerName, Card | null> {
         let fromArr: [Card | null, Player][];
         if (this.currentState === 'discarding') {
@@ -165,12 +184,12 @@ export class GameState {
             fromArr = this.previousTrick;
         }
         return Object.fromEntries(
-            playerNameArr.map((name): [PlayerName, Card | null] => [
+            playerNameArr.map((name): [PlayerName, Card | 'back' | null] => [
                 name,
                 this.getPlayedCard(name, fromArr)
             ]
         )
-        ) as Record<PlayerName, Card | null>
+        ) as Record<PlayerName, Card | null>;
 
     }
 
@@ -392,11 +411,7 @@ export class GameState {
         return ({
             hands: { comp1: [], player: this.currentState === "hand_complete" ? [] : this.humanHand.slice(), comp2: [], comp3: [] },
             trumpCards: this.trumpCards,
-            played: Object.fromEntries(
-                playerNameArr.map((name): [PlayerName, Card | null | 'back'] => [
-                    name, this.getPlayedCard(name, this.trickInProgress)
-                ])
-            ) as Record<PlayerName, Card | null>,
+            played: this.played,
             previous: this.previous,
 
             gameState: this.currentState,
@@ -408,7 +423,7 @@ export class GameState {
 
 export interface GameStateForUI {
     hands: Record<PlayerName, Card[]>;
-    played: Record<PlayerName, Card | null>;
+    played: Record<PlayerName, Card | null | 'back'>;
     previous: Record<PlayerName, Card | null>;
 
     handNumber: number;

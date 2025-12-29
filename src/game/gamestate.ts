@@ -61,14 +61,14 @@ export class GameState {
                 this.resetTrick();
                 break;
             case 'hand_complete':
-                // this.updateScores(log);
-                // if (this.escalations >= this.playTo) {
-                //     this.currentState = "gameComplete";
-                // } else {
-                //     this.previousSpoils = this.spoils.slice();
-                //     this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
-                //     this.dealCards(this.pack, log);
-                // }
+                // TODO: for the mo, just simple hand-length winning condition
+                // in reality this happens continuously
+                if (this.handNumber >= 8) {
+                    this.currentState = 'game_complete';
+                } else {
+                    this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
+                    this.dealCards();
+                }
                 break;
             case 'game_complete':
                 break;

@@ -230,7 +230,7 @@ export class GameState {
                 (trumpSuit) => Suit.suitEquals(card.suit, trumpSuit)
             ).some(Boolean)
         );
-        let winningCard: Card;
+        let winningCard: Card | null = null;
         if (trumpCardsPlayed.length > 0) {
             let trumpsHighToLow = [...trumpSuits].reverse();
             for (const trumpSuit of trumpsHighToLow) {
@@ -242,13 +242,15 @@ export class GameState {
                     break;
                 }
             }
-            // TODO: error
-            throw new Error('severe card winner error');
         } else {
             const ledCardsPlayed = this.trickInProgress.filter(
                 ([card, _player]) => Suit.suitEquals(card.suit, this.currentLedSuit as Suit)
             );
             winningCard = Card.singleHighestCard(ledCardsPlayed.map(([card, _player]) => card))
+        }
+        if (winningCard === null) {
+            // TODO: error
+            throw new Error('severe card winner error');
         }
         return winningCard;
     }

@@ -58,7 +58,7 @@ export class GameState {
                 const _discardIndex = await this.computerDiscard();
                 break;
             case 'trick_complete':
-                // this.resetTrick(log);
+                this.resetTrick();
                 break;
             case 'hand_complete':
                 // this.updateScores(log);
@@ -214,9 +214,9 @@ export class GameState {
         return ((playerIndex + 1) % this.numPlayers);
     }
 
-    public trickWinnerPlayer(trumpSuit: Suit): Player {
+    public trickWinnerPlayer(trumpSuits: Suit[]): Player {
         const winningCardPlay = this.trickInProgress.filter(
-            ([card, player]) => Card.cardEquals(card, this.winningCard(trumpSuit))
+            ([card, player]) => Card.cardEquals(card, this.winningCard(trumpSuits))
         );
         // TODO: length check?
         const trickWinner = winningCardPlay[0][1];
@@ -224,13 +224,26 @@ export class GameState {
     }
 
 
-    public winningCard(trumpSuit: Suit): Card {
+    public winningCard(trumpSuits: Suit[]): Card {
         const trumpCardsPlayed = this.trickInProgress.filter(
-            ([card, _player]) => Suit.suitEquals(card.suit, trumpSuit)
+            ([card, _player]) => trumpSuits.map(
+                (trumpSuit) => Suit.suitEquals(card.suit, trumpSuit)
+            ).some(Boolean)
         );
         let winningCard: Card;
         if (trumpCardsPlayed.length > 0) {
-            winningCard = Card.singleHighestCard(trumpCardsPlayed.map(([card, _player]) => card));
+            let trumpsHighToLow = [...trumpSuits].reverse();
+            for (const trumpSuit of trumpsHighToLow) {
+                const thisTrumpSuitCardsPlayed: [Card, Player][] = trumpCardsPlayed.filter(
+                    ([card, player]) => Suit.suitEquals(card.suit, trumpSuit)
+                )
+                if (thisTrumpSuitCardsPlayed.length > 0) {
+                    winningCard = Card.singleHighestCard(trumpCardsPlayed.map(([card, _player]) => card));
+                    break;
+                }
+            }
+            // TODO: error
+            throw new Error('severe card winner error');
         } else {
             const ledCardsPlayed = this.trickInProgress.filter(
                 ([card, _player]) => Suit.suitEquals(card.suit, this.currentLedSuit as Suit)
@@ -405,6 +418,24 @@ export class GameState {
         this.currentPlayerIndex = this.getNextPlayerIndex(this.dealerIndex);
         this.handNumber++;
         this.trickIndex = 0;
+    }
+
+    resetTrick(): void {
+        const winnerPlayer = this.trickWinnerPlayer(this.trumps);
+        this.currentPlayerIndex = winnerPlayer.positionIndex;
+        // TODO: scores
+        // TODO: update trumps
+
+        this.previousTrick = this.trickInProgress
+        // empty the trick, and increment the counter!
+        this.trickInProgress = [];
+        this.trickIndex++;
+        if (this.handNotFinished) {
+            this.currentState = "play_card";
+        } else {
+            this.currentState = "hand_complete";
+        }
+
     }
 
     getStateForUI(): GameStateForUI {

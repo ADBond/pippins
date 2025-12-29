@@ -1,4 +1,4 @@
-import { GameConfig, GameState } from "./gamestate";
+import { GameConfig, GameState, GameStateForUI } from "./gamestate";
 import { AgentName } from "./agent/agent";
 
 const defaultConfig: GameConfig = {}
@@ -30,4 +30,9 @@ export class Game {
     //   this.currentLog = new GameLog(this.gameID, this.state.config, this.playerNames, this.simulation);
     // }
   }
+
+  getGameStateForUI(): GameStateForUI {
+    return this.state.getStateForUI();
+  }
+
 }

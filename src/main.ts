@@ -1,10 +1,11 @@
 import { newGame } from "./interface/game";
+import { playUntilHuman } from "./interface/api";
+import { renderWithDelays } from "./interface/render";
 
 async function loadGame() {
-    // TODO:
   newGame();
-//   const futureStates = await playUntilHuman();
-//   await renderWithDelays(futureStates);
+  const futureStates = await playUntilHuman();
+  await renderWithDelays(futureStates);
 }
 
 

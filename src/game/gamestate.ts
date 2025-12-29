@@ -1,11 +1,11 @@
 import { Card, Suit, getFullPack, shuffle } from "./card";
-import { Player, PlayerName } from "./player";
+import { Player, PlayerName, playerNameArr } from "./player";
 import { Agent, AgentName, agentLookup } from "./agent/agent";
 
 export type GameConfig = {
 }
 
-export type state = 'game_initialise' | 'discarding' | 'play_card' | 'trick_complete' | 'hand_complete' | 'game_complete';
+export type state = 'game_initialise' | 'discarding' | 'play_card' | 'trick_complete' | 'hand_complete' | 'new_hand' | 'game_complete';
 
 export class GameState {
     public dealerIndex: number;
@@ -43,8 +43,8 @@ export class GameState {
         // choose a random initial dealer
         this.dealerIndex = Math.floor(Math.random() * playerNames.length);
         // dummy values:
-        this.currentPlayerIndex = -1;
-        this.trickIndex = -1;
+        this.currentPlayerIndex = 0;
+        this.trickIndex = 0;
     }
 
     public async increment() {
@@ -301,4 +301,32 @@ export class GameState {
         this.trickIndex = 0;
     }
 
+    getStateForUI(): GameStateForUI {
+        return ({
+            hands: { comp1: [], player: this.currentState === "hand_complete" ? [] : this.humanHand.slice(), comp2: [], comp3: [] },
+            trumpCards: this.trumpCards,
+            played: Object.fromEntries(
+                playerNameArr.map((name): [PlayerName, Card | null] => [name, this.getPlayedCard(name, this.trickInProgress)])
+            ) as Record<PlayerName, Card | null>,
+            previous: Object.fromEntries(
+                playerNameArr.map((name): [PlayerName, Card | null] => [name, this.getPlayedCard(name, this.previousTrick)])
+            ) as Record<PlayerName, Card | null>,
+
+            gameState: this.currentState,
+            whoseTurn: this.currentPlayer.name,
+            handNumber: this.handNumber,
+        })
+    }
+}
+
+export interface GameStateForUI {
+    hands: Record<PlayerName, Card[]>;
+    played: Record<PlayerName, Card | null>;
+    previous: Record<PlayerName, Card | null>;
+
+    handNumber: number;
+    trumpCards: Card[];
+
+    gameState: state;
+    whoseTurn: PlayerName;
 }

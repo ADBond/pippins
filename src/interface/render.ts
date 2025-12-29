@@ -5,7 +5,7 @@ import { onHumanPlay } from './api';
 
 
 export async function renderState(state: GameStateForUI) {
-
+  console.log(state);
   const handEl = document.getElementById('player-hand')!;
   const playerHand = state.hands.player;
   playerHand.sort(
@@ -66,7 +66,10 @@ const delayMap: Record<state, number> = {
 }
 
 export async function renderWithDelays(states: GameStateForUI[]) {
+  console.log('rendering');
   for (const state of states) {
+    console.log('render')
+    console.log(state);
     await renderState(state);
     await wait(delayMap[state.gameState]);
   }

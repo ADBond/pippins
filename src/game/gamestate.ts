@@ -46,6 +46,7 @@ export class GameState {
 
     public async increment() {
         const state = this.currentState;
+        console.log(`Incrementing state - currently: ${state}`);
         switch (state) {
             case 'game_initialise':
                 this.dealCards();
@@ -254,7 +255,9 @@ export class GameState {
         const currentLegalMoves = this.legalMoveIndices.map(
             (index) => 52 + index
         );
+        console.log('Ready to chose a move...');
         const moveIndex = await agent.chooseMove(this, currentLegalMoves);
+        console.log('Chosen!');
         // translate move back to card index
         const cardToPlayIndex = moveIndex - 52;
         const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
@@ -274,6 +277,7 @@ export class GameState {
     }
 
     makeDiscard(card: Card): boolean {
+        console.log(`Discarding ${card}`)
         if (!this.legalMoveIndices.includes(card.index)) {
             console.log(`Error: Cannot discard illegal card ${card}`);
             return false;
@@ -289,6 +293,7 @@ export class GameState {
             c => c.rank === card.rank && c.suit === card.suit
         );
         if (index < 0) {
+            console.log(`Error: I couldn't find a the card in hand ${hand}`);
             return false;
         }
         const [playedCard] = hand.splice(index, 1);
@@ -299,6 +304,7 @@ export class GameState {
         }
         const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
         this.currentPlayerIndex = newCurrentPlayerIndex;
+        console.log('happy discard path');
         return true;
     }
 

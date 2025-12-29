@@ -35,12 +35,14 @@ export async function playUntilHuman(): Promise<GameStateForUI[]> {
         || !(current.whoseTurn === "player"))
         && counter < 50
     ) {
+        console.log(`Looping: ${counter}`);
         game = getGame()
         await game.incrementState();
         current = game.getGameStateForUI();
         states.push(current);
         counter++;
     }
+    console.log(`Human done after: ${counter}`);
 
     return states;
 }

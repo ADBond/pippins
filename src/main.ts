@@ -8,8 +8,6 @@ async function loadGame() {
   await renderWithDelays(futureStates);
 }
 
-
-
 document.addEventListener("DOMContentLoaded", async () => {
   await loadGame();
 });

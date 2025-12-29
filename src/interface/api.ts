@@ -3,13 +3,21 @@ import { GameStateForUI } from "../game/gamestate";
 import { renderWithDelays } from "./render";
 import { getGame } from "./game";
 
-export function playCard(state: GameStateForUI, card: Card): void {
+export function playCard(card: Card): void {
     const game = getGame();
-    game.state.playCard(card);
+    const currentState = game.state.currentState;
+    if (currentState === 'play_card') {
+        game.state.playCard(card);
+    } else if (currentState === 'discarding') {
+        game.state.makeDiscard(card);
+    } else {
+        console.log('Cant move');
+        console.log(currentState);
+    }
 }
 
-export async function onHumanPlay(state: GameStateForUI, card: Card) {
-    playCard(state, card);
+export async function onHumanPlay(card: Card) {
+    playCard(card);
     const futureStates = await playUntilHuman();
     await renderWithDelays(futureStates);
 }
@@ -23,7 +31,7 @@ export async function playUntilHuman(): Promise<GameStateForUI[]> {
     let counter = 0;
 
     while (
-        (!['playCard', 'gameComplete'].includes(current.gameState)
+        (!['play_card', 'discarding', 'game_complete'].includes(current.gameState)
         || !(current.whoseTurn === "player"))
         && counter < 50
     ) {

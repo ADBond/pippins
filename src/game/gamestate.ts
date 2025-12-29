@@ -17,7 +17,7 @@ export class GameState {
     public players: Player[] = [];
     public trickIndex: number;
     public trickInProgress: [Card, Player][] = [];
-    public discards: Card[] = [];
+    public discards: [Card, Player][] = [];
 
     public handNumber: number = 0;
     public currentState: state = 'game_initialise';
@@ -37,9 +37,6 @@ export class GameState {
                 i,
             )
         )
-        for (const name of playerNames) {
-            this.players.push();
-        }
         // choose a random initial dealer
         this.dealerIndex = Math.floor(Math.random() * playerNames.length);
         // dummy values:
@@ -54,7 +51,10 @@ export class GameState {
                 this.dealCards();
                 break;
             case 'play_card':
-                const moveIndex = await this.computerMove();
+                const _moveIndex = await this.computerMove();
+                break;
+            case 'discarding':
+                const _discardIndex = await this.computerDiscard();
                 break;
             case 'trick_complete':
                 // this.resetTrick(log);
@@ -68,9 +68,6 @@ export class GameState {
                 //     this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
                 //     this.dealCards(this.pack, log);
                 // }
-                break;
-            case 'discarding':
-                // TODO
                 break;
             case 'game_complete':
                 break;
@@ -224,6 +221,11 @@ export class GameState {
             console.log("Error: trying to move for a human")
             return -20;
         }
+        if (this.currentState !== 'play_card') {
+            // TODO: error
+            console.log(`Error: can't play card in ${this.currentState}`)
+            return -20;
+        }
 
         const currentLegalMoves = this.legalMoveIndices;
         const cardToPlayIndex = await agent.chooseMove(this, currentLegalMoves);
@@ -235,12 +237,69 @@ export class GameState {
         return cardToPlayIndex;
     }
 
+    private async computerDiscard(): Promise<number> {
+        const agent = this.currentPlayer.agent;
+        if (agent === 'human') {
+            // TODO: error
+            console.log("Error: trying to move for a human")
+            return -20;
+        }
+        if (this.currentState !== 'discarding') {
+            // TODO: error
+            console.log(`Error: can't discard in ${this.currentState}`)
+            return -20;
+        }
+
+        // naive legal moves are indexed for 'playing' - shift by 52 for discard encoding
+        const currentLegalMoves = this.legalMoveIndices.map(
+            (index) => 52 + index
+        );
+        const moveIndex = await agent.chooseMove(this, currentLegalMoves);
+        // translate move back to card index
+        const cardToPlayIndex = moveIndex - 52;
+        const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
+
+        if (!this.makeDiscard(cardToPlay)) {
+            console.log("Error playing card");
+        }
+        return cardToPlayIndex;
+    }
+
     giveCardToPlayer(playerIndex: number, card: Card) {
         this.players[playerIndex].hand.push(card);
     }
 
     getPlayerHand(playerIndex: number): Card[] {
         return this.players[playerIndex].hand ?? [];
+    }
+
+    makeDiscard(card: Card): boolean {
+        if (!this.legalMoveIndices.includes(card.index)) {
+            console.log(`Error: Cannot discard illegal card ${card}`);
+            return false;
+        }
+        const player = this.currentPlayer;
+        const hand = player.hand;
+        if (!hand) {
+            console.log("Error: I couldn't find a hand!");
+            return false;
+        }
+
+        const index = hand.findIndex(
+            c => c.rank === card.rank && c.suit === card.suit
+        );
+        if (index < 0) {
+            return false;
+        }
+        const [playedCard] = hand.splice(index, 1);
+        this.discards.push([playedCard, player]);
+
+        if (this.discards.length === this.numPlayers) {
+            this.currentState = "play_card";
+        }
+        const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
+        this.currentPlayerIndex = newCurrentPlayerIndex;
+        return true;
     }
 
     playCard(card: Card): boolean {

@@ -1,6 +1,6 @@
 import { createCardElement } from './ui';
 import { GameStateForUI, state } from '../game/gamestate';
-import {PlayerName, playerNameArr } from '../game/player';
+import { PlayerName, playerNameArr } from '../game/player';
 import { onHumanPlay } from './api';
 
 
@@ -18,7 +18,7 @@ export async function renderState(state: GameStateForUI) {
   handEl.innerHTML = '';
   playerHand.forEach(card => {
     handEl.appendChild(
-      createCardElement(card.toStringShort(), state.whoseTurn === "player" ? (() => onHumanPlay(state, card)) : undefined)
+      createCardElement(card.toStringShort(), state.whoseTurn === "player" ? (() => onHumanPlay(card)) : undefined)
     )
   });
 

@@ -11,7 +11,7 @@ export async function renderState(state: GameStateForUI) {
   playerHand.sort(
     (c1, c2) => (
       // 100 big enough to ensure we always sort by suit first
-      100*(c1.suit.rankForTrumpPreference - c2.suit.rankForTrumpPreference) +
+      100 * (c1.suit.rankForTrumpPreference - c2.suit.rankForTrumpPreference) +
       (c1.rank.trickTakingRank - c2.rank.trickTakingRank)
     )
   );
@@ -31,7 +31,7 @@ export async function renderState(state: GameStateForUI) {
       el = createCardElement('back');
     } else {
       el = createCardElement(
-          card !== null ? card.toStringShort() : ""
+        card !== null ? card.toStringShort() : ""
       );
       el.classList.add('played-card');
     }
@@ -42,7 +42,7 @@ export async function renderState(state: GameStateForUI) {
     const prevEl = document.getElementById(`prev-${p}`)!;
     prevEl.innerHTML = '';
     const card = state.previous[p as PlayerName];
-    const el = createCardElement(card !== null ? card.toStringShort(): "");
+    const el = createCardElement(card !== null ? card.toStringShort() : "");
     el.classList.add('played-card');
     prevEl.appendChild(el);
   });
@@ -52,9 +52,12 @@ export async function renderState(state: GameStateForUI) {
   // and current status
   document.getElementById('hand-number')!.innerText = `(hand #${state.handNumber})`;
 
-  // const trumpEl = document.getElementById('trumps')!;
-  // trumpEl.innerHTML = '';
-  // trumpEl.appendChild(createSuitElement(state.trumps ? state.trumps.toStringShort() : ""));
+  const trumpsEl = document.getElementById('trump-holder')!;
+  trumpsEl.innerHTML = '';
+  state.trumpCards.forEach(card => {
+    const el = createCardElement(card.toStringShort());
+    trumpsEl.appendChild(el);
+  });
 
   // TODO: populate the scores in the UI
 

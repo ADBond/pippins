@@ -84,6 +84,14 @@ export class Card {
         return cards[0];
     }
 
+    static lowestCards(cards: Card[]): Card[] {
+        const lowestRank = Math.min(...cards.map(card => card.rank.trickTakingRank));
+        const lowestCards = cards.filter(
+            card => card.rank.trickTakingRank === lowestRank
+        )
+        return lowestCards;
+    }
+
     static singleHighestCard(cards: Card[]): Card {
         const highestRank = Math.max(...cards.map(card => card.rank.trickTakingRank));
         const highestCards = cards.filter(
@@ -94,7 +102,6 @@ export class Card {
             console.log(`Too many highest cards: ${highestCards}`);
         }
         return highestCards[0];
-        
     }
 }
 

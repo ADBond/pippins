@@ -424,7 +424,7 @@ export class GameState {
         const winnerPlayer = this.trickWinnerPlayer(this.trumps);
         this.currentPlayerIndex = winnerPlayer.positionIndex;
         // TODO: scores
-        // TODO: update trumps
+        this.updateTrumps();
 
         this.previousTrick = this.trickInProgress
         // empty the trick, and increment the counter!
@@ -435,7 +435,23 @@ export class GameState {
         } else {
             this.currentState = "hand_complete";
         }
+    }
 
+    updateTrumps(): void {
+        const cardsAboveTrumps = this.trickInProgress.filter(
+            ([card, player]) => card.rank.trickTakingRank > this.topTrumpRankValue
+        ).map(([card, player]) => card);
+        if (cardsAboveTrumps.length === 0) {
+            return;
+        }
+        const lowestCardNotBelowTrumps = Card.lowestCards(cardsAboveTrumps);
+        // in case of ties, last played 'wins'
+        const newTrump = lowestCardNotBelowTrumps[lowestCardNotBelowTrumps.length - 1];
+        // remove existing cards of this suit
+        this.trumpCards.filter(
+            (card) => !Suit.suitEquals(card.suit, newTrump.suit)
+        )
+        this.trumpCards.push(newTrump);
     }
 
     getStateForUI(): GameStateForUI {

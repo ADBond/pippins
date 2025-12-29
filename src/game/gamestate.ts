@@ -238,7 +238,7 @@ export class GameState {
                     ([card, player]) => Suit.suitEquals(card.suit, trumpSuit)
                 )
                 if (thisTrumpSuitCardsPlayed.length > 0) {
-                    winningCard = Card.singleHighestCard(trumpCardsPlayed.map(([card, _player]) => card));
+                    winningCard = Card.singleHighestCard(thisTrumpSuitCardsPlayed.map(([card, _player]) => card));
                     break;
                 }
             }

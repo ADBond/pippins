@@ -138,7 +138,7 @@ export class GameState {
         )[0];
     }
 
-    private getPlayedCard(name: PlayerName, trick: [Card, Player][]): Card | null {
+    private getPlayedCard(name: PlayerName, trick: [Card | null, Player][]): Card | null {
         const playerPlayedCards = trick.filter(
             ([_card, player]) => player.name === name
         );
@@ -150,6 +150,28 @@ export class GameState {
             console.log(`getPlayedCard error: ${playerPlayedCards}`);
         }
         return null;
+    }
+
+    get previous(): Record<PlayerName, Card | null> {
+        let fromArr: [Card | null, Player][];
+        if (this.currentState === 'discarding') {
+            fromArr = this.players.map(
+                (player) => [null, player]
+            )
+        }
+        else if (this.previousTrick.length === 0){
+            fromArr = this.discards;
+        } else {
+            fromArr = this.previousTrick;
+        }
+        return Object.fromEntries(
+            playerNameArr.map((name): [PlayerName, Card | null] => [
+                name,
+                this.getPlayedCard(name, fromArr)
+            ]
+        )
+        ) as Record<PlayerName, Card | null>
+
     }
 
     get currentPlayer(): Player {
@@ -371,11 +393,11 @@ export class GameState {
             hands: { comp1: [], player: this.currentState === "hand_complete" ? [] : this.humanHand.slice(), comp2: [], comp3: [] },
             trumpCards: this.trumpCards,
             played: Object.fromEntries(
-                playerNameArr.map((name): [PlayerName, Card | null] => [name, this.getPlayedCard(name, this.trickInProgress)])
+                playerNameArr.map((name): [PlayerName, Card | null | 'back'] => [
+                    name, this.getPlayedCard(name, this.trickInProgress)
+                ])
             ) as Record<PlayerName, Card | null>,
-            previous: Object.fromEntries(
-                playerNameArr.map((name): [PlayerName, Card | null] => [name, this.getPlayedCard(name, this.previousTrick)])
-            ) as Record<PlayerName, Card | null>,
+            previous: this.previous,
 
             gameState: this.currentState,
             whoseTurn: this.currentPlayer.name,

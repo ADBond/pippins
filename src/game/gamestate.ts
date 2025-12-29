@@ -450,9 +450,9 @@ export class GameState {
         // in case of ties, last played 'wins'
         const newTrump = lowestCardNotBelowTrumps[lowestCardNotBelowTrumps.length - 1];
         // remove existing cards of this suit
-        this.trumpCards.filter(
+        this.trumpCards = this.trumpCards.filter(
             (card) => !Suit.suitEquals(card.suit, newTrump.suit)
-        )
+        );
         this.trumpCards.push(newTrump);
     }
 

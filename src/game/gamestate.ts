@@ -23,7 +23,7 @@ export class GameState {
     public currentState: state = 'game_initialise';
 
     public previousTrick: [Card, Player][] = [];
-    // last_trick_card_scores: list[int] = field(default_factory=list)
+    public lastTrickScores: number[] = [];
 
     constructor(public playerNames: AgentName[], public config: GameConfig) {
         // TODO: more / flexi ??
@@ -130,6 +130,32 @@ export class GameState {
             }
         }
         return legalCards.map(card => card.index);
+    }
+
+    cardValue(card: Card): number {
+        const trumpCards = this.trumpCards;
+        if (trumpCards.length === 0) {
+            return 0;
+        }
+        const thresholdValue = trumpCards[trumpCards.length - 1].rank.trickTakingRank;
+        if (card.rank.trickTakingRank > thresholdValue) {
+            return 0;
+        }
+        let cardValue = 1;
+        const trumpCardsHighToLow = [...trumpCards].reverse();
+        for (const trumpCard of trumpCardsHighToLow) {
+            if (Suit.suitEquals(trumpCard.suit, card.suit)) {
+                break;
+            }
+            cardValue++;
+        }
+        const trumpRanks = this.trumpCards.map(
+            (card) => card.rank.trickTakingRank
+        )
+        if (trumpRanks.includes(card.rank.trickTakingRank)) {
+            cardValue *= 2;
+        }
+        return cardValue;
     }
 
     getPlayer(name: PlayerName): Player {
@@ -424,8 +450,9 @@ export class GameState {
 
     resetTrick(): void {
         const winnerPlayer = this.trickWinnerPlayer(this.trumps);
-        this.currentPlayerIndex = winnerPlayer.positionIndex;
-        // TODO: scores
+        const winnerPlayerIndex = winnerPlayer.positionIndex;
+        this.currentPlayerIndex = winnerPlayerIndex;
+        this.updateScores(winnerPlayerIndex);
         this.updateTrumps();
 
         this.previousTrick = this.trickInProgress
@@ -456,12 +483,51 @@ export class GameState {
         this.trumpCards.push(newTrump);
     }
 
+    updateScores(winnerPlayerIndex: number): void {
+        // current rules:
+        // each trick is 1 point
+        // cards above top trump are 0
+        // cards same or below top trump are:
+        // 1 each in top trump suit
+        // 2 each in second suit
+        // 3 ...
+        // 4 ...
+        // (number of trump suits) + 1 if not yet in a trump
+
+        const cardScores: number[] = this.trickInProgressCards.map(
+            (card) => this.cardValue(card)
+        );
+        const trickValue = cardScores.reduce((x, y) => x + y, 0) + 1;
+
+        // update the scores
+        this.players[winnerPlayerIndex].scores.push(trickValue);
+        this.players[(winnerPlayerIndex + 2) % this.numPlayers].scores.push(trickValue);
+        // other players explicitly score 0 !
+        this.players[(winnerPlayerIndex + 1) % this.numPlayers].scores.push(0);
+        this.players[(winnerPlayerIndex + 3) % this.numPlayers].scores.push(0);
+
+        this.lastTrickScores = cardScores;
+    }
+
     getStateForUI(): GameStateForUI {
         return ({
             hands: { comp1: [], player: this.currentState === "hand_complete" ? [] : this.humanHand.slice(), comp2: [], comp3: [] },
             trumpCards: this.trumpCards,
             played: this.played,
             previous: this.previous,
+
+            scores: Object.fromEntries(
+                this.players.map(
+                    (player) => [player.name, player.score]
+               )
+            ) as Record<PlayerName, number>,
+            prevScores: Object.fromEntries(
+                this.players.map(
+                    (player) => [player.name, player.previousScore]
+               )
+            ) as Record<PlayerName, number>,
+            lastTrickCardScores: this.lastTrickScores,
+
 
             gameState: this.currentState,
             whoseTurn: this.currentPlayer.name,
@@ -474,6 +540,10 @@ export interface GameStateForUI {
     hands: Record<PlayerName, Card[]>;
     played: Record<PlayerName, Card | null | 'back'>;
     previous: Record<PlayerName, Card | null>;
+
+    scores: Record<PlayerName, number>,
+    prevScores: Record<PlayerName, number>,
+    lastTrickCardScores: number[],
 
     handNumber: number;
     trumpCards: Card[];

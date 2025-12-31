@@ -61,6 +61,17 @@ export async function renderState(state: GameStateForUI) {
 
   // TODO: populate the scores in the UI
 
+  const scoresEl = document.getElementById('scores')!;
+  scoresEl.innerHTML = '';
+  const breakdownEl = document.createElement('p');
+  breakdownEl.innerText = 'last trick: (1) + ' + state.lastTrickCardScores.join(' + ');
+  scoresEl.appendChild(breakdownEl);
+  playerNameArr.forEach(player => {
+      const el = document.createElement('p');
+      el.innerText = `${player}: ${state.scores[player]}  [${state.prevScores[player]}]`;
+      scoresEl.appendChild(el);
+  });
+
   // document.getElementById('debug')!.innerText = `${state.gameState}`;
 
 }

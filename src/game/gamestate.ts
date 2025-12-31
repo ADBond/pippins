@@ -441,6 +441,7 @@ export class GameState {
         console.log([...this.getPlayerHand(2)]);
         console.log([...this.getPlayerHand(3)]);
         this.trumpCards = [];
+        this.discards = [];
         // TODO: could adjust this in config:
         this.currentState = 'discarding';
         this.currentPlayerIndex = this.getNextPlayerIndex(this.dealerIndex);

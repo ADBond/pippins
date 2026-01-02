@@ -23,7 +23,7 @@ export class GameState {
     public currentState: state = 'game_initialise';
 
     public previousTrick: [Card, Player][] = [];
-    public lastTrickScores: number[] = [];
+    public lastTrickScores: [Card, number][] = [];
 
     constructor(public playerNames: AgentName[], public config: GameConfig) {
         // TODO: more / flexi ??
@@ -497,10 +497,14 @@ export class GameState {
         // 4 ...
         // (number of trump suits) + 1 if not yet in a trump
 
-        const cardScores: number[] = this.trickInProgressCards.map(
-            (card) => this.cardValue(card)
+        const cardScores: [Card, number][] = this.trickInProgressCards.map(
+            (card) => [card, this.cardValue(card)]
         );
-        const trickValue = cardScores.reduce((x, y) => x + y, 0) + 1;
+        const trickValue = cardScores.map(
+            ([card, score]) => score
+        ).reduce(
+            (x, y) => x + y, 0
+        ) + 1;
 
         // update the scores
         this.players[winnerPlayerIndex].scores.push(trickValue);
@@ -546,7 +550,7 @@ export interface GameStateForUI {
 
     scores: Record<PlayerName, number>,
     prevScores: Record<PlayerName, number>,
-    lastTrickCardScores: number[],
+    lastTrickCardScores: [Card, number][],
 
     handNumber: number;
     trumpCards: Card[];

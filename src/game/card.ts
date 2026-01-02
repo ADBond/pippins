@@ -143,6 +143,8 @@ export function getFullPack(): Card[] {
     return cards;
   }
 
+export const packSize = getFullPack().length;
+
 export function shuffle(cards: Card[]) {
     for (let i = cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));

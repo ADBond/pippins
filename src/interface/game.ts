@@ -4,7 +4,7 @@ let game: Game;
 
 export function newGame(): void {
     game = new Game(
-        ['human', 'random', 'random', 'random'],
+        ['human', 'saltcote_pippins', 'saltcote_pippins', 'saltcote_pippins'],
         {},
     );
 }

@@ -11,9 +11,7 @@ COPY public/ ./public/
 COPY src/ ./src/
 COPY index.html ./index.html
 
-RUN mkdir -p public/wasm && \
-    cp node_modules/onnxruntime-web/dist/ort-wasm-*.wasm public/wasm/ && \
-    cp node_modules/onnxruntime-web/dist/ort-wasm-*.mjs public/wasm/
+RUN npm run prepare:wasm
 
 EXPOSE 5173
 

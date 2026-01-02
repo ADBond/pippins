@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified, sorry :/2\" && exit 1",
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build"
+    "build": "vite build",
+    "prepare:wasm": "mkdir -p public/wasm && cp node_modules/onnxruntime-web/dist/ort-wasm-*.wasm public/wasm/ && cp node_modules/onnxruntime-web/dist/ort-wasm-*.mjs public/wasm/",
+    "build:pages": "npm run prepare:wasm && npm run build"
   },
   "keywords": [],
   "author": "Andy Bond",

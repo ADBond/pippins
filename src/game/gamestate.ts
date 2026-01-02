@@ -549,6 +549,7 @@ export class GameState {
             whoseTurn: this.currentPlayer.name,
             handNumber: this.handNumber,
             trickNumber: this.trickNumber,
+            target: this.config.targetScore,
         })
     }
 }
@@ -565,6 +566,7 @@ export interface GameStateForUI {
     handNumber: number;
     trickNumber: number;
     trumpCards: Card[];
+    target: number;
 
     gameState: state;
     whoseTurn: PlayerName;

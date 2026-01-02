@@ -49,6 +49,7 @@ export async function renderState(state: GameStateForUI) {
 
 
   // game status - config
+  document.getElementById('config')!.innerText = `playing to ${state.target}`;
   // and current status
   document.getElementById('hand-number')!.innerText = `(hand #${state.handNumber}, trick #${state.trickNumber})`;
 

@@ -66,8 +66,8 @@ export async function renderState(state: GameStateForUI) {
     `Last trick: (1) + ${state.lastTrickCardScores.join(' + ')}`;
 
   const nameLookup = {
-    comp1: 'E & W',
     comp2: 'Player & N',
+    comp1: 'E & W',
   } as const;
 
   type Partnership = keyof typeof nameLookup;

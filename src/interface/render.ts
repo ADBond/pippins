@@ -66,12 +66,24 @@ export async function renderState(state: GameStateForUI) {
   const breakdownEl = document.createElement('p');
   breakdownEl.innerText = 'last trick: (1) + ' + state.lastTrickCardScores.join(' + ');
   scoresEl.appendChild(breakdownEl);
-  playerNameArr.forEach(player => {
-      const el = document.createElement('p');
-      el.innerText = `${player}: ${state.scores[player]}  [${state.prevScores[player]}]`;
-      scoresEl.appendChild(el);
-  });
+  const nameLookup: { comp1: string, comp2: string } = {
+    comp2: 'Player & N',
+    comp1: 'E & W',
+  };
+  const representativePlayers = Object.keys(nameLookup) as (keyof typeof nameLookup)[];
 
+  for (const player of representativePlayers) {
+    const playerScoreEl = document.createElement('p');
+    const nameEl = document.createElement('span');
+    const scoreEl = document.createElement('span');
+    nameEl.innerText = `${nameLookup[player]}`;
+    nameEl.classList.add('player-name');
+    playerScoreEl.appendChild(nameEl);
+    scoreEl.innerText = `: ${state.scores[player]}  [${state.prevScores[player]}]`;
+    playerScoreEl.append(scoreEl);
+
+    scoresEl.appendChild(playerScoreEl);
+  }
   // document.getElementById('debug')!.innerText = `${state.gameState}`;
 
 }

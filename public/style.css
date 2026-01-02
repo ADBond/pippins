@@ -150,3 +150,8 @@ body {
 .prev-slot .card {
     margin: 2px;
 }
+
+.player-name {
+    font-weight: bold;
+    color: #aaf;
+}

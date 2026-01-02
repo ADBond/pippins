@@ -76,6 +76,10 @@ export class GameState {
         return 12;
     }
 
+    get trickNumber(): number {
+        return this.trickIndex + 1;
+    }
+
     get numTrumps(): number {
         return this.trumpCards.length;
     }
@@ -544,6 +548,7 @@ export class GameState {
             gameState: this.currentState,
             whoseTurn: this.currentPlayer.name,
             handNumber: this.handNumber,
+            trickNumber: this.trickNumber,
         })
     }
 }
@@ -558,6 +563,7 @@ export interface GameStateForUI {
     lastTrickCardScores: [Card, number][],
 
     handNumber: number;
+    trickNumber: number;
     trumpCards: Card[];
 
     gameState: state;

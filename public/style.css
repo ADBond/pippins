@@ -89,19 +89,19 @@ body {
 }
 
 .trumps {
-  min-height: 120px;
-  background-color: #aaa;
-  width: 220px;
-  margin: 0 auto;
-  border-radius: 5px;
+    min-height: 120px;
+    background-color: #aaa;
+    width: 220px;
+    margin: 0 auto;
+    border-radius: 5px;
 }
 
 .trumps .card {
-  margin-left: -50px;
+    margin-left: -50px;
 }
 
 .trumps .card:first-child {
-  margin-left: 0;
+    margin-left: 0;
 }
 
 .previous-trick {
@@ -154,4 +154,66 @@ body {
 .player-name {
     font-weight: bold;
     color: #aaf;
+}
+
+.scores-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+
+.scores {
+    background: #ffffff;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    min-width: 260px;
+}
+
+#scores-breakdown {
+    display: block;
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.75rem;
+    text-align: center;
+}
+
+.scores-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.scores-table th {
+    font-weight: 600;
+    padding: 0.4rem 0.5rem;
+    border-bottom: 1px solid #ddd;
+    color: #444;
+}
+
+.scores-table td {
+    padding: 0.4rem 0.5rem;
+}
+
+.scores-table tr:not(:first-child):hover {
+    background: #f3f5f8;
+}
+
+.player-name {
+    font-weight: 500;
+}
+
+.scores-table td:nth-child(2),
+.scores-table td:nth-child(3) {
+    width: 4rem;
+}
+
+.scores-table td {
+    color: black;
+}
+
+.score-up {
+    color: #1a7f37;
+    font-weight: 600;
 }

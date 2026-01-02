@@ -382,7 +382,9 @@ export class GameState {
         this.discards.push([playedCard, player]);
 
         if (this.discards.length === this.numPlayers) {
+            // finished discarding - also reset previous trick now
             this.currentState = "play_card";
+            this.previousTrick = [];
         }
         const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
         this.currentPlayerIndex = newCurrentPlayerIndex;

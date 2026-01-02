@@ -62,14 +62,8 @@ export class GameState {
                 this.resetTrick();
                 break;
             case 'hand_complete':
-                // TODO: for the mo, just simple hand-length winning condition
-                // in reality this happens continuously
-                if (this.handNumber >= 8) {
-                    this.currentState = 'game_complete';
-                } else {
-                    this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
-                    this.dealCards();
-                }
+                this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
+                this.dealCards();
                 break;
             case 'game_complete':
                 break;
@@ -457,6 +451,10 @@ export class GameState {
         const winnerPlayerIndex = winnerPlayer.positionIndex;
         this.currentPlayerIndex = winnerPlayerIndex;
         this.updateScores(winnerPlayerIndex);
+        if (this.gameIsFinished) {
+            this.currentState = "game_complete";
+            return;
+        }
         this.updateTrumps();
 
         this.previousTrick = this.trickInProgress
@@ -502,7 +500,7 @@ export class GameState {
             (card) => [card, this.cardValue(card)]
         );
         const trickValue = cardScores.map(
-            ([card, score]) => score
+            ([_card, score]) => score
         ).reduce(
             (x, y) => x + y, 0
         ) + 1;
@@ -515,6 +513,12 @@ export class GameState {
         this.players[(winnerPlayerIndex + 3) % this.numPlayers].scores.push(0);
 
         this.lastTrickScores = cardScores;
+    }
+
+    get gameIsFinished(): boolean {
+        return this.players.map(
+            (player) => player.score
+        ).some((score) => score > this.config.targetScore)
     }
 
     getStateForUI(): GameStateForUI {

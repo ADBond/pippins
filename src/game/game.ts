@@ -1,7 +1,9 @@
 import { GameConfig, GameState, GameStateForUI } from "./gamestate";
 import { AgentName } from "./agent/agent";
 
-const defaultConfig: GameConfig = {}
+export const defaultConfig: GameConfig = {
+  targetScore: 600,
+}
 
 export class Game {
   public state: GameState;

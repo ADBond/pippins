@@ -1,11 +1,12 @@
 import { Game } from "../game/game";
+import { defaultConfig } from "../game/game";
 
 let game: Game;
 
 export function newGame(): void {
     game = new Game(
         ['human', 'saltcote_pippins', 'saltcote_pippins', 'saltcote_pippins'],
-        {},
+        defaultConfig,
     );
 }
 

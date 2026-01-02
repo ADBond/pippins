@@ -59,19 +59,51 @@ export async function renderState(state: GameStateForUI) {
     trumpsEl.appendChild(el);
   });
 
-  // TODO: populate the scores in the UI
+  const scoresTableEl = document.getElementById('scores-table') as HTMLTableElement;
+  const breakdownEl = document.getElementById('scores-breakdown') as HTMLSpanElement;
 
-  const scoresEl = document.getElementById('scores')!;
-  scoresEl.innerHTML = '';
-  const breakdownEl = document.createElement('p');
-  breakdownEl.innerText = 'last trick: (1) + ' + state.lastTrickCardScores.join(' + ');
-  scoresEl.appendChild(breakdownEl);
-  playerNameArr.forEach(player => {
-      const el = document.createElement('p');
-      el.innerText = `${player}: ${state.scores[player]}  [${state.prevScores[player]}]`;
-      scoresEl.appendChild(el);
-  });
+  const lastTrickScoresText = state.lastTrickCardScores.map(
+    ([card, score]) => `${score} (${card.toStringShort()})`
+  );
+  breakdownEl.textContent = `prev: 1 + ${lastTrickScoresText.join(' + ')}`;
 
+  const nameLookup = {
+    comp2: 'Player & N',
+    comp1: 'E & W',
+  } as const;
+
+  type Partnership = keyof typeof nameLookup;
+
+  scoresTableEl.replaceChildren();
+
+  const headerRow = document.createElement('tr');
+  for (const title of ['Partnership', 'Score', 'Previous']) {
+    const th = document.createElement('th');
+    th.textContent = title;
+    headerRow.appendChild(th);
+  }
+  scoresTableEl.appendChild(headerRow);
+
+  for (const player of Object.keys(nameLookup) as Partnership[]) {
+    const row = document.createElement('tr');
+
+    const nameTd = document.createElement('td');
+    nameTd.textContent = nameLookup[player];
+    nameTd.classList.add('player-name');
+
+    const scoreTd = document.createElement('td');
+    scoreTd.textContent = String(state.scores[player]);
+
+    if (state.prevScores[player] > 0) {
+      scoreTd.classList.add('score-up');
+    }
+
+    const prevTd = document.createElement('td');
+    prevTd.textContent = String(state.prevScores[player]);
+
+    row.append(nameTd, scoreTd, prevTd);
+    scoresTableEl.appendChild(row);
+  }
   // document.getElementById('debug')!.innerText = `${state.gameState}`;
 
 }

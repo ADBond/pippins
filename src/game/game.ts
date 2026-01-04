@@ -3,6 +3,7 @@ import { AgentName } from "./agent/agent";
 
 export const defaultConfig: GameConfig = {
   targetScore: 600,
+  trumpRule: 'mobile',
 }
 
 export class Game {

@@ -3,7 +3,8 @@ import { Player, PlayerName, playerNameArr } from "./player";
 import { Agent, AgentName, agentLookup } from "./agent/agent";
 
 export type GameConfig = {
-    targetScore: number
+    targetScore: number,
+    trumpRule: 'mobile',
 }
 
 export type state = 'game_initialise' | 'discarding' | 'play_card' | 'trick_complete' | 'hand_complete' | 'new_hand' | 'game_complete';

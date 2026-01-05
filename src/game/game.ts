@@ -37,7 +37,7 @@ export class Game {
   }
 
   async incrementState() {
-    await this.state.increment();
+    await this.state.increment(this.currentLog);
     if (this.currentLog.complete) {
       this.logs.push(this.currentLog);
       sendGameLog(this.currentLog);

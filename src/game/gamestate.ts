@@ -1,6 +1,7 @@
 import { Card, Suit, getFullPack, shuffle } from "./card";
 import { Player, PlayerName, playerNameArr } from "./player";
 import { Agent, AgentName, agentLookup } from "./agent/agent";
+import { GameLog } from "./log";
 
 export type GameConfig = {
     targetScore: number,
@@ -46,12 +47,12 @@ export class GameState {
         this.trickIndex = 0;
     }
 
-    public async increment() {
+    public async increment(log: GameLog) {
         const state = this.currentState;
         console.log(`Incrementing state - currently: ${state}`);
         switch (state) {
             case 'game_initialise':
-                this.dealCards();
+                this.dealCards(log);
                 break;
             case 'play_card':
                 const _moveIndex = await this.computerMove();
@@ -60,11 +61,16 @@ export class GameState {
                 const _discardIndex = await this.computerDiscard();
                 break;
             case 'trick_complete':
-                this.resetTrick();
+                this.resetTrick(log);
                 break;
             case 'hand_complete':
                 this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
-                this.dealCards();
+
+                log.handScores = this.scores;
+                log.complete = true;
+                log.discards = this.discards.map(([card, _player]) => card);
+        
+                this.dealCards(log);
                 break;
             case 'game_complete':
                 break;
@@ -162,6 +168,10 @@ export class GameState {
         return this.players.filter(
             (player) => player.name === name
         )[0];
+    }
+
+    get scores(): number[] {
+        return this.players.map(player => player.score);
     }
 
     private getPlayedCard(name: PlayerName, trick: [Card | null, Player][]): Card | null {
@@ -423,7 +433,7 @@ export class GameState {
     }
 
     // TODO: seed?
-    dealCards(): void {
+    dealCards(log: GameLog): void {
         const pack = getFullPack();
         shuffle(pack);
         for (let i = 0; i < 13; i++) {
@@ -449,9 +459,16 @@ export class GameState {
         this.currentPlayerIndex = this.getNextPlayerIndex(this.dealerIndex);
         this.handNumber++;
         this.trickIndex = 0;
+
+        // and update the current log
+        log.dealerIndex = this.dealerIndex;
+        log.handNumber = this.handNumber;
+        log.captureHands(this.players.map((player) => [...this.getPlayerHand(player.positionIndex)]));
+        log.startingScores = this.players.map((player) => player.score);
+        log.captureTrumpCards(this.trumpCards);
     }
 
-    resetTrick(): void {
+    resetTrick(log: GameLog): void {
         const winnerPlayer = this.trickWinnerPlayer(this.trumps);
         const winnerPlayerIndex = winnerPlayer.positionIndex;
         this.currentPlayerIndex = winnerPlayerIndex;
@@ -463,6 +480,8 @@ export class GameState {
         this.updateTrumps();
 
         this.previousTrick = this.trickInProgress
+
+        log.captureTrick(this.scores, this.trickInProgress, winnerPlayer.positionIndex);
         // empty the trick, and increment the counter!
         this.trickInProgress = [];
         this.trickIndex++;

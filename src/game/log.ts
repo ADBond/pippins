@@ -10,7 +10,7 @@ export class GameLog {
     // snapshots of all trump cards per trick
     private trump_cards: Card[][] = [];
     private hands: Card[][] = [];
-    private discards: Card[][] = [];
+    public discards: Card[] = [];
 
     private playerCount: number = 4;
 
@@ -55,6 +55,10 @@ export class GameLog {
         );
     }
 
+    captureTrumpCards(trump_cards: Card[]) {
+        this.trump_cards.push([...trump_cards]);
+    }
+
 
     get finalScores(): number[] {
         return Array.from(
@@ -70,6 +74,8 @@ export class GameLog {
 
 // send game log to storage
 export async function sendGameLog(log: GameLog) {
+    console.log(log);
+    return;
     try {
         const res = await fetch("https://verdant-starship-e1215c.netlify.app/.netlify/functions/saveGameLog", {
             method: "POST",

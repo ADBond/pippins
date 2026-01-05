@@ -482,6 +482,7 @@ export class GameState {
         this.previousTrick = this.trickInProgress
 
         log.captureTrick(this.scores, this.trickInProgress, winnerPlayer.positionIndex);
+        log.captureTrumpCards(this.trumpCards);
         // empty the trick, and increment the counter!
         this.trickInProgress = [];
         this.trickIndex++;

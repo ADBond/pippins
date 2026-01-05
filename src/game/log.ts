@@ -9,14 +9,15 @@ declare const __COMMIT_HASH__: string;
 export class GameLog {
     // snapshots of all trump cards per trick
     private trump_cards: Card[][] = [];
-    private hands: Card[][] = [];
+    private hands: Card[][] = [];  // TODO: this is out of sync
     public discards: Card[] = [];
 
     private playerCount: number = 4;
 
     public dealerIndex: number = -1;
-    public handNumber: number = -1;
+    public handNumber: number = -1;  // TODO: this is out of sync
     // each trick is array of player scores, [card, playerIndex], along with  winner index
+    // TODO: we should capture trick value also (instead?) of player scores
     private tricks: [number[], [Card, number][], number][] = [];
 
     public startingScores: number[] = [];
@@ -74,8 +75,8 @@ export class GameLog {
 
 // send game log to storage
 export async function sendGameLog(log: GameLog) {
+    console.log("Game Log:");
     console.log(log);
-    return;
     try {
         const res = await fetch("https://verdant-starship-e1215c.netlify.app/.netlify/functions/saveGameLog", {
             method: "POST",

@@ -9,13 +9,13 @@ declare const __COMMIT_HASH__: string;
 export class GameLog {
     // snapshots of all trump cards per trick
     private trump_cards: Card[][] = [];
-    private hands: Card[][] = [];  // TODO: this is out of sync
+    private hands: Card[][] = [];
     public discards: Card[] = [];
 
     private playerCount: number = 4;
 
     public dealerIndex: number = -1;
-    public handNumber: number = -1;  // TODO: this is out of sync
+    public handNumber: number = -1;
     // each trick is array of player scores, [card, playerIndex], along with  winner index
     // TODO: we should capture trick value also (instead?) of player scores
     private tricks: [number[], [Card, number][], number][] = [];

@@ -69,8 +69,9 @@ export class GameState {
                 log.handScores = this.scores;
                 log.complete = true;
                 log.discards = this.discards.map(([card, _player]) => card);
-        
-                this.dealCards(log);
+                
+                // initialise as separate state - keeps from doing too much at once
+                this.currentState = 'game_initialise';
                 break;
             case 'game_complete':
                 break;

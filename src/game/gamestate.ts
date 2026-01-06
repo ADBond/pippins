@@ -66,14 +66,12 @@ export class GameState {
             case 'hand_complete':
                 this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
 
-                log.handScores = this.scores;
-                log.complete = true;
-                log.discards = this.discards.map(([card, _player]) => card);
-                
+                this.completeLog(log);
                 // initialise as separate state - keeps from doing too much at once
                 this.currentState = 'game_initialise';
                 break;
             case 'game_complete':
+                this.completeLog(log);
                 break;
             default:
             // error!
@@ -546,6 +544,12 @@ export class GameState {
         return this.players.map(
             (player) => player.score
         ).some((score) => score > this.config.targetScore)
+    }
+
+    completeLog(log: GameLog) {
+        log.handScores = this.scores;
+        log.complete = true;
+        log.discards = this.discards.map(([card, _player]) => card);
     }
 
     getStateForUI(): GameStateForUI {

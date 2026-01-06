@@ -18,7 +18,7 @@ export class GameLog {
     public handNumber: number = -1;
     // each trick is array of player scores, [card, playerIndex], along with  winner index
     // TODO: we should capture trick value also (instead?) of player scores
-    private tricks: [number[], [Card, number][], number][] = [];
+    private tricks: [number, [Card, number][], number][] = [];
 
     public startingScores: number[] = [];
     public handScores: number[] = [];
@@ -33,10 +33,10 @@ export class GameLog {
         private players: AgentName[],
     ) { }
 
-    captureTrick(scores: number[], trick: [Card, Player][], winnerIndex: number) {
+    captureTrick(score: number, trick: [Card, Player][], winnerIndex: number) {
         this.tricks.push(
             [
-                scores,
+                score,
                 trick.map(([card, player]) => [card, player.positionIndex]),
                 winnerIndex,
             ]

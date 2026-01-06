@@ -473,7 +473,7 @@ export class GameState {
         const winnerPlayer = this.trickWinnerPlayer(this.trumps);
         const winnerPlayerIndex = winnerPlayer.positionIndex;
         this.currentPlayerIndex = winnerPlayerIndex;
-        this.updateScores(winnerPlayerIndex);
+        const trickValue = this.updateScores(winnerPlayerIndex);
         if (this.gameIsFinished) {
             this.currentState = "game_complete";
             return;
@@ -482,7 +482,7 @@ export class GameState {
 
         this.previousTrick = this.trickInProgress
 
-        log.captureTrick(this.scores, this.trickInProgress, winnerPlayer.positionIndex);
+        log.captureTrick(trickValue, this.trickInProgress, winnerPlayer.positionIndex);
         log.captureTrumpCards(this.trumpCards);
         // empty the trick, and increment the counter!
         this.trickInProgress = [];
@@ -511,7 +511,7 @@ export class GameState {
         this.trumpCards.push(newTrump);
     }
 
-    updateScores(winnerPlayerIndex: number): void {
+    updateScores(winnerPlayerIndex: number): number {
         // current rules:
         // each trick is 1 point
         // cards above top trump are 0
@@ -539,6 +539,7 @@ export class GameState {
         this.players[(winnerPlayerIndex + 3) % this.numPlayers].scores.push(0);
 
         this.lastTrickScores = cardScores;
+        return trickValue;
     }
 
     get gameIsFinished(): boolean {

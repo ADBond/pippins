@@ -66,7 +66,7 @@ export async function renderState(state: GameStateForUI) {
   const lastTrickScoresText = state.lastTrickCardScores.map(
     ([card, score]) => `${score} (${card.toStringShort()})`
   );
-  breakdownEl.textContent = `prev: 1 + ${lastTrickScoresText.join(' + ')}`;
+  breakdownEl.textContent = `prev: ${lastTrickScoresText.join(' + ')}`;
 
   const nameLookup = {
     comp2: 'Player & N',

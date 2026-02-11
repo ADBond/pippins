@@ -527,7 +527,7 @@ export class GameState {
             ([_card, score]) => score
         ).reduce(
             (x, y) => x + y, 0
-        ) + 1;
+        );
 
         // update the scores
         this.players[winnerPlayerIndex].scores.push(trickValue);

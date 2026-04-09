@@ -25,7 +25,8 @@ export class GameLog {
 
     public complete: boolean = false;
     private version: string = getCommitHash();
-    private logVersion: number = 2;
+    private logVersion: number = 3;
+    private game: string = 'pippins';
 
     constructor(
         private gameID: string,

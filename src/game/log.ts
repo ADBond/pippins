@@ -78,7 +78,7 @@ export async function sendGameLog(log: GameLog) {
     console.log("Game Log:");
     console.log(log);
     try {
-        const res = await fetch("https://verdant-starship-e1215c.netlify.app/.netlify/functions/saveGameLog", {
+        const res = await fetch("https://qaw-games.netlify.app/.netlify/functions/saveGameLog", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(log),

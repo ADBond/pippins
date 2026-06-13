@@ -5,6 +5,97 @@ body {
     color: white;
 }
 
+
+#new-game-button {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+
+    padding: 6px 10px;
+    font-size: 14px;
+    background: rgb(255, 255, 108);
+    color: black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.2s ease;
+}
+
+#new-game-button:hover {
+    background-color: #770;
+    color: #000;
+}
+
+#new-game-menu {
+    position: fixed;
+    top: 50px;
+    left: 10px;
+    background: #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    width: 220px;
+    font-size: 14px;
+    padding: 10px;
+    color: #fff;
+}
+
+#new-game-menu fieldset {
+    border: none;
+    margin: 0 0 12px 0;
+    padding: 0;
+}
+
+#new-game-menu legend {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #bbb;
+}
+
+#new-game-menu label {
+    display: block;
+    background: #444;
+    padding: 10px 12px;
+    margin-bottom: 6px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+#new-game-menu input[type="radio"] {
+    display: none;
+}
+
+#new-game-menu label:hover {
+    background: #770;
+}
+
+#new-game-menu input[type="radio"]:checked+label {
+    background: rgb(255, 255, 108);
+    color: black;
+    font-weight: bold;
+}
+
+#play-now {
+    width: 100%;
+    padding: 10px;
+    background: rgb(255, 255, 108);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+#play-now:hover {
+    background: #770;
+}
+
 .game-board {
     position: relative;
     width: 900px;

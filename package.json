@@ -14,9 +14,9 @@
   "author": "Andy Bond",
   "license": "MIT",
   "devDependencies": {
-    "tsx": "^4.20.6",
+    "tsx": "^4.22.4",
     "typescript": "^5.8.3",
-    "vite": "^6.3.5"
+    "vite": "^8.0.16"
   },
   "dependencies": {
     "onnxruntime-web": "^1.23.2"

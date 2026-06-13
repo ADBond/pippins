@@ -1,12 +1,12 @@
 import { Game } from "../game/game";
-import { defaultConfig } from "../game/game";
+import { GameConfig } from "../game/gamestate";
 
 let game: Game;
 
-export function newGame(): void {
+export function newGame(config: GameConfig): void {
     game = new Game(
         ['human', 'saltcote_pippins', 'saltcote_pippins', 'saltcote_pippins'],
-        defaultConfig,
+        config,
     );
 }
 

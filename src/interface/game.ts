@@ -1,11 +1,13 @@
+import { AgentName } from "../game/agent/agent";
 import { Game } from "../game/game";
 import { GameConfig } from "../game/gamestate";
 
 let game: Game;
+let opp: AgentName = 'ismcts1000';
 
 export function newGame(config: GameConfig): void {
     game = new Game(
-        ['human', 'saltcote_pippins', 'saltcote_pippins', 'saltcote_pippins'],
+        ['human', opp, opp, opp],
         config,
     );
 }

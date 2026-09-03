@@ -16,7 +16,7 @@ export function agentLookup(name: AgentName): Agent {
     } else if (name === 'random') {
         return randomAgent;
     } else if (name === 'ismcts1000') {
-        return ismctsAgent(10, randomAgent);
+        return ismctsAgent(1000, randomAgent);
     }
     throw new Error(`Unknown agent ${name}`);
 }

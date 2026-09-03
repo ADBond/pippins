@@ -1,5 +1,4 @@
 import { GameState } from "../gamestate";
-import { modelName } from "../models";
 import { randomAgent } from "./random";
 import { ismctsAgent } from "./ismcts/agent";
 
@@ -8,7 +7,7 @@ export interface ComputerAgent {
 }
 
 export type Agent = ComputerAgent | 'human';
-export type AgentName = 'human' | 'random' | 'ismcts1000' | modelName;
+export type AgentName = 'human' | 'random' | 'ismcts1000';
 
 export function agentLookup(name: AgentName): Agent {
     if (name === 'human') {

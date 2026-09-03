@@ -137,7 +137,8 @@ export async function ismcts(
                 // tried everything at least once - use UCB to decide where to go
                 node = node.bestChildByUCB(legalMoves, c);
             }
-            state.moveFromIndex(node.move);
+            // console.log(`My node is ${node.move}`);
+            state.genericMoveFromIndex(node.move);
             // check if we can finish a trick and allocate rewards
             while (!["play_card", "discarding", "hand_complete", "game_complete"].includes(state.currentState)) {
                 let initialState = state.currentState;
@@ -158,6 +159,7 @@ export async function ismcts(
         while (!["hand_complete", "game_complete"].includes(state.currentState)) {  // false positive
             // console.log(`Rollout for ${i}... (${state.currentState}, hand is ${state.handNumber})`);
             let initialState = state.currentState;
+            // console.log(`Initial state is ${initialState}`);
             await state.increment();
             if (initialState === "trick_complete") {
                 let trick = state.prevTrickScores;

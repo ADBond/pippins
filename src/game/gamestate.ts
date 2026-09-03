@@ -67,20 +67,19 @@ export class GameState {
         newState.trumpCards = [...this.trumpCards];
         newState.players = this.players.map(player => player.clone());
         newState.trickIndex = this.trickIndex;
-        // TODO: does it matter that these players are different to the ones in player array?
         newState.trickInProgress = this.trickInProgress.map(
-            ([card, player]) => [card, player.clone()]
+            ([card, player]) => [card, newState.players[player.positionIndex]]
         );
         newState.playedCards = [...this.playedCards];
         newState.discards = this.discards.map(
-            ([card, player]) => [card, player.clone()]
+            ([card, player]) => [card, newState.players[player.positionIndex]]
         );
     
         newState.handNumber = this.handNumber;
         newState.currentState = this.currentState;
 
         newState.previousTrick = this.previousTrick.map(
-            ([card, player]) => [card, player.clone()]
+            ([card, player]) => [card, newState.players[player.positionIndex]]
         );
         newState.lastTrickScores = this.lastTrickScores.map(
             ([card, num]) => [card, num]
@@ -90,7 +89,7 @@ export class GameState {
 
     public async increment(log: GameLog | null = null) {
         const state = this.currentState;
-        console.log(`Incrementing state - currently: ${state}`);
+        // console.log(`Incrementing state - currently: ${state}`);
         switch (state) {
             case 'game_initialise':
                 this.dealCards(log);
@@ -356,12 +355,34 @@ export class GameState {
     }
 
     public moveFromIndex(cardToPlayIndex: number): number {
+        if (this.currentState !== 'play_card') {
+            throw new Error(`Can't play card ${cardToPlayIndex} in state ${this.currentState}`);
+        }
         const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
 
         if (!this.playCard(cardToPlay)) {
             console.log("Error playing card");
         }
         return cardToPlayIndex;
+    }
+
+    private discardFromIndex(cardIndex: number): number {
+        if (this.currentState !== 'discarding') {
+            throw new Error(`Can't discard ${cardIndex} in state ${this.currentState}`);
+        }
+        const cardToPlay = Card.cardFromIndex(cardIndex, this.pack);
+
+        if (!this.makeDiscard(cardToPlay)) {
+            console.log("Error discarding");
+        }
+        return cardIndex;
+    }
+
+    public genericMoveFromIndex(moveIndex: number): number {
+        if (this.currentState === 'play_card') {
+            return this.moveFromIndex(moveIndex);
+        }
+        return this.discardFromIndex(moveIndex);
     }
 
     private async computerMove(): Promise<number> {
@@ -414,7 +435,6 @@ export class GameState {
     }
 
     makeDiscard(card: Card): boolean {
-        console.log(`Discarding ${card}`)
         if (!this.legalMoveIndices.includes(card.index)) {
             console.log(`Error: Cannot discard illegal card ${card}`);
             return false;
@@ -445,7 +465,6 @@ export class GameState {
         }
         const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
         this.currentPlayerIndex = newCurrentPlayerIndex;
-        console.log('happy discard path');
         return true;
     }
 

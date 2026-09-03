@@ -17,6 +17,17 @@ export class Player {
         // public scores: ScoreBreakdown[] = [],
     ) { }
 
+    public clone(): Player {
+        return new Player(
+            this.displayName,
+            this.name,
+            this.agent,  // TODO: fine to share?
+            this.positionIndex,
+            [...this.hand],
+            [...this.scores],
+        );
+    }
+
     get score(): number {
         const scores = this.scores;
         return scores.length === 0 ? 0 : scores.reduce(

@@ -8,6 +8,10 @@ export type GameConfig = {
     trumpRule: 'mobile',
 }
 
+function copyConfig(config: GameConfig): GameConfig {
+    return {targetScore: config.targetScore, trumpRule: config.trumpRule};
+}
+
 export type state = 'game_initialise' | 'discarding' | 'play_card' | 'trick_complete' | 'hand_complete' | 'new_hand' | 'game_complete';
 
 export class GameState {
@@ -20,6 +24,7 @@ export class GameState {
     public players: Player[] = [];
     public trickIndex: number;
     public trickInProgress: [Card, Player][] = [];
+    public playedCards: Card[] = [];
     public discards: [Card, Player][] = [];
 
     public handNumber: number = 0;
@@ -47,9 +52,44 @@ export class GameState {
         this.trickIndex = 0;
     }
 
-    public async increment(log: GameLog) {
+    public clone(): GameState {
+        // make a (deep) copy - at least of the things we care about
+        const newConfig = copyConfig(this.config);
+        const playerNames = [...this.playerNames];
+        const newState = new GameState(playerNames, newConfig);
+
+        // copy remaining state
+        newState.dealerIndex = this.dealerIndex;
+        newState.currentPlayerIndex = this.currentPlayerIndex;
+        newState.leaderIndex = this.leaderIndex;
+        newState.pack = [...this.pack];
+
+        newState.trumpCards = [...this.trumpCards];
+        newState.players = this.players.map(player => player.clone());
+        newState.trickIndex = this.trickIndex;
+        newState.trickInProgress = this.trickInProgress.map(
+            ([card, player]) => [card, newState.players[player.positionIndex]]
+        );
+        newState.playedCards = [...this.playedCards];
+        newState.discards = this.discards.map(
+            ([card, player]) => [card, newState.players[player.positionIndex]]
+        );
+    
+        newState.handNumber = this.handNumber;
+        newState.currentState = this.currentState;
+
+        newState.previousTrick = this.previousTrick.map(
+            ([card, player]) => [card, newState.players[player.positionIndex]]
+        );
+        newState.lastTrickScores = this.lastTrickScores.map(
+            ([card, num]) => [card, num]
+        );
+        return newState;
+    }
+
+    public async increment(log: GameLog | null = null) {
         const state = this.currentState;
-        console.log(`Incrementing state - currently: ${state}`);
+        // console.log(`Incrementing state - currently: ${state}`);
         switch (state) {
             case 'game_initialise':
                 this.dealCards(log);
@@ -66,12 +106,16 @@ export class GameState {
             case 'hand_complete':
                 this.dealerIndex = this.getNextPlayerIndex(this.dealerIndex);
 
-                this.completeLog(log);
+                if (log !== null) {
+                    this.completeLog(log);
+                }
                 // initialise as separate state - keeps from doing too much at once
                 this.currentState = 'game_initialise';
                 break;
             case 'game_complete':
-                this.completeLog(log);
+                if (log !== null) {
+                    this.completeLog(log);
+                }
                 break;
             default:
             // error!
@@ -167,6 +211,10 @@ export class GameState {
         return this.players.filter(
             (player) => player.name === name
         )[0];
+    }
+
+    get prevTrickScores(): number[] {
+        return this.players.map(player => player.previousScore);
     }
 
     get scores(): number[] {
@@ -306,6 +354,37 @@ export class GameState {
         );
     }
 
+    public moveFromIndex(cardToPlayIndex: number): number {
+        if (this.currentState !== 'play_card') {
+            throw new Error(`Can't play card ${cardToPlayIndex} in state ${this.currentState}`);
+        }
+        const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
+
+        if (!this.playCard(cardToPlay)) {
+            console.log("Error playing card");
+        }
+        return cardToPlayIndex;
+    }
+
+    private discardFromIndex(cardIndex: number): number {
+        if (this.currentState !== 'discarding') {
+            throw new Error(`Can't discard ${cardIndex} in state ${this.currentState}`);
+        }
+        const cardToPlay = Card.cardFromIndex(cardIndex, this.pack);
+
+        if (!this.makeDiscard(cardToPlay)) {
+            console.log("Error discarding");
+        }
+        return cardIndex;
+    }
+
+    public genericMoveFromIndex(moveIndex: number): number {
+        if (this.currentState === 'play_card') {
+            return this.moveFromIndex(moveIndex);
+        }
+        return this.discardFromIndex(moveIndex);
+    }
+
     private async computerMove(): Promise<number> {
         const agent = this.currentPlayer.agent;
         if (agent === 'human') {
@@ -321,12 +400,7 @@ export class GameState {
 
         const currentLegalMoves = this.legalMoveIndices;
         const cardToPlayIndex = await agent.chooseMove(this, currentLegalMoves);
-        const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
-
-        if (!this.playCard(cardToPlay)) {
-            console.log("Error playing card");
-        }
-        return cardToPlayIndex;
+        return this.moveFromIndex(cardToPlayIndex);
     }
 
     private async computerDiscard(): Promise<number> {
@@ -342,15 +416,8 @@ export class GameState {
             return -20;
         }
 
-        // naive legal moves are indexed for 'playing' - shift by 52 for discard encoding
-        const currentLegalMoves = this.legalMoveIndices.map(
-            (index) => 52 + index
-        );
-        console.log('Ready to chose a move...');
-        const moveIndex = await agent.chooseMove(this, currentLegalMoves);
-        console.log('Chosen!');
-        // translate move back to card index
-        const cardToPlayIndex = moveIndex - 52;
+        const currentLegalMoves = this.legalMoveIndices;
+        const cardToPlayIndex = await agent.chooseMove(this, currentLegalMoves);
         const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
 
         if (!this.makeDiscard(cardToPlay)) {
@@ -368,7 +435,6 @@ export class GameState {
     }
 
     makeDiscard(card: Card): boolean {
-        console.log(`Discarding ${card}`)
         if (!this.legalMoveIndices.includes(card.index)) {
             console.log(`Error: Cannot discard illegal card ${card}`);
             return false;
@@ -394,10 +460,11 @@ export class GameState {
             // finished discarding - also reset previous trick now
             this.currentState = "play_card";
             this.previousTrick = [];
+            // only now should we update the 'public cards' with discards
+            this.playedCards.push(...this.discards.map(([card, _p]) => card));
         }
         const newCurrentPlayerIndex = this.getNextPlayerIndex(this.currentPlayerIndex);
         this.currentPlayerIndex = newCurrentPlayerIndex;
-        console.log('happy discard path');
         return true;
     }
 
@@ -421,6 +488,7 @@ export class GameState {
         }
         const [playedCard] = hand.splice(index, 1);
         this.trickInProgress.push([playedCard, player]);
+        this.playedCards.push(playedCard);
 
         if (this.trickInProgress.length === this.numPlayers) {
             this.currentState = "trick_complete";
@@ -432,7 +500,7 @@ export class GameState {
     }
 
     // TODO: seed?
-    dealCards(log: GameLog): void {
+    dealCards(log: GameLog | null): void {
         const pack = getFullPack();
         shuffle(pack);
         for (let i = 0; i < 13; i++) {
@@ -445,14 +513,15 @@ export class GameState {
         }
 
         // TODO now pack should be empty
-        console.log("Empty pack:");
-        console.log([...pack]);
-        console.log([...this.getPlayerHand(0)]);
-        console.log([...this.getPlayerHand(1)]);
-        console.log([...this.getPlayerHand(2)]);
-        console.log([...this.getPlayerHand(3)]);
+        // console.log("Empty pack:");
+        // console.log([...pack]);
+        // console.log([...this.getPlayerHand(0)]);
+        // console.log([...this.getPlayerHand(1)]);
+        // console.log([...this.getPlayerHand(2)]);
+        // console.log([...this.getPlayerHand(3)]);
         this.trumpCards = [];
         this.discards = [];
+        this.playedCards = [];
         // TODO: could adjust this in config:
         this.currentState = 'discarding';
         this.currentPlayerIndex = this.getNextPlayerIndex(this.dealerIndex);
@@ -460,14 +529,16 @@ export class GameState {
         this.trickIndex = 0;
 
         // and update the current log
-        log.dealerIndex = this.dealerIndex;
-        log.handNumber = this.handNumber;
-        log.captureHands(this.players.map((player) => [...this.getPlayerHand(player.positionIndex)]));
-        log.startingScores = this.players.map((player) => player.score);
-        log.captureTrumpCards(this.trumpCards);
+        if (log !== null) {
+            log.dealerIndex = this.dealerIndex;
+            log.handNumber = this.handNumber;
+            log.captureHands(this.players.map((player) => [...this.getPlayerHand(player.positionIndex)]));
+            log.startingScores = this.players.map((player) => player.score);
+            log.captureTrumpCards(this.trumpCards);
+        }
     }
 
-    resetTrick(log: GameLog): void {
+    resetTrick(log: GameLog | null): void {
         const winnerPlayer = this.trickWinnerPlayer(this.trumps);
         const winnerPlayerIndex = winnerPlayer.positionIndex;
         this.currentPlayerIndex = winnerPlayerIndex;
@@ -480,8 +551,10 @@ export class GameState {
 
         this.previousTrick = this.trickInProgress
 
-        log.captureTrick(trickValue, this.trickInProgress, winnerPlayer.positionIndex);
-        log.captureTrumpCards(this.trumpCards);
+        if (log !== null) {
+            log.captureTrick(trickValue, this.trickInProgress, winnerPlayer.positionIndex);
+            log.captureTrumpCards(this.trumpCards);
+        }
         // empty the trick, and increment the counter!
         this.trickInProgress = [];
         this.trickIndex++;

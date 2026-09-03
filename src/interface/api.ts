@@ -3,7 +3,7 @@ import { GameStateForUI } from "../game/gamestate";
 import { renderWithDelays } from "./render";
 import { getGame } from "./game";
 
-export function playCard(card: Card): void {
+export function playCard(card: Card): GameStateForUI {
     const game = getGame();
     const currentState = game.state.currentState;
     if (currentState === 'play_card') {
@@ -14,10 +14,14 @@ export function playCard(card: Card): void {
         console.log('Cant move');
         console.log(currentState);
     }
+    return game.state.getStateForUI();
 }
 
 export async function onHumanPlay(card: Card) {
-    playCard(card);
+    const state = playCard(card);
+    // render the immediate state update so we needn't wait for slower AIs
+    await renderWithDelays([state]);
+    // TODO: for slow AIs do we have an option to skip delay and render in playUntilHuman() ?
     const futureStates = await playUntilHuman();
     await renderWithDelays(futureStates);
 }

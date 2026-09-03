@@ -79,7 +79,7 @@ export class Card {
     static cardFromIndex(index: number, pack: Card[]): Card {
         const cards = pack.filter(card => card.index === index);
         if (cards.length !== 1) {
-            console.log(`Error in cardFromIndex: ${cards}`);
+            console.log(`Error in cardFromIndex: ${cards}, could not find ${index}`);
         }
         return cards[0];
     }

@@ -11,8 +11,6 @@ COPY public/ ./public/
 COPY src/ ./src/
 COPY index.html ./index.html
 
-RUN npm run prepare:wasm
-
 EXPOSE 5173
 
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

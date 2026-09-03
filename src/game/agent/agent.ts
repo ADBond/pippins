@@ -1,7 +1,6 @@
 import { GameState } from "../gamestate";
 import { modelName } from "../models";
 import { randomAgent } from "./random";
-import { nnAgent } from "./nn";
 import { ismctsAgent } from "./ismcts/agent";
 
 export interface ComputerAgent {
@@ -19,5 +18,5 @@ export function agentLookup(name: AgentName): Agent {
     } else if (name === 'ismcts1000') {
         return ismctsAgent(10, randomAgent);
     }
-    return nnAgent(name);
+    throw new Error(`Unknown agent ${name}`);
 }

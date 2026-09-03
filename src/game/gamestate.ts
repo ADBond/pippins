@@ -396,14 +396,18 @@ export class GameState {
         }
 
         // naive legal moves are indexed for 'playing' - shift by 52 for discard encoding
-        const currentLegalMoves = this.legalMoveIndices.map(
-            (index) => 52 + index
-        );
+        // const currentLegalMoves = this.legalMoveIndices.map(
+        //     (index) => 52 + index
+        // );
+        const currentLegalMoves = this.legalMoveIndices;
         console.log('Ready to chose a move...');
         const moveIndex = await agent.chooseMove(this, currentLegalMoves);
-        console.log('Chosen!');
         // translate move back to card index
-        const cardToPlayIndex = moveIndex - 52;
+        // temp compat
+        // const cardToPlayIndex = moveIndex >= 52 ? moveIndex - 52 : moveIndex;
+        const cardToPlayIndex = moveIndex;
+        // const cardToPlayIndex = moveIndex;
+        console.log(`Chosen! ${moveIndex} (or card: ${cardToPlayIndex})`);
         const cardToPlay = Card.cardFromIndex(cardToPlayIndex, this.pack)
 
         if (!this.makeDiscard(cardToPlay)) {

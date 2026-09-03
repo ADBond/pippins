@@ -13,7 +13,7 @@
   "license": "MIT",
   "devDependencies": {
     "tsx": "^4.20.6",
-    "typescript": "^5.8.3",
+    "typescript": "^7.0.2",
     "vite": "^6.3.5"
   }
 }
